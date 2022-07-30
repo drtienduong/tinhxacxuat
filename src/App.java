@@ -1,48 +1,51 @@
-// v1.0 with 4 core
+
+// v2.0 input with array
 import java.io.FileWriter; // Import the FileWriter class
 import java.io.IOException; // Import the IOException class to handle errors
 
 public class App {
-    public static int inp_winrate = 50;
-    public static int inp_i = 2;
-    public static int inp_n  = 4;
+    public static int[] inp_winrate = { 51, 52 , 53 , 54 , 55 };
+    public static int[] inp_i = { 3,4,5,6,7,8,9,10 };
+    public static int[] inp_n = { 11,26,57,120,247,502,1013,2036 };
     public static int inp_oneTest = 1000;
     public static int inp_allTest = 2500;
-    
 
     public static void main(String[] args) throws Exception {
         long startTime, endTime;
-
-        // multi thread
         startTime = System.nanoTime();
 
-        thread t1 = new thread(inp_i , inp_n , inp_oneTest , inp_allTest , inp_winrate) ;
-        t1.start();
-        thread t2 = new thread(inp_i , inp_n , inp_oneTest , inp_allTest , inp_winrate);
-        t2.start();
-        thread t3 = new thread(inp_i , inp_n , inp_oneTest , inp_allTest , inp_winrate);
-        t3.start();
-        thread t4 = new thread(inp_i , inp_n , inp_oneTest , inp_allTest , inp_winrate);
-        t4.start();
-        
+        for (int w = 0; w < inp_winrate.length; w++) {
+            for (int i = 0; i < inp_i.length; i++) {
+                // multi thread
+                thread t1 = new thread(inp_i[i], inp_n[i], inp_oneTest, inp_allTest, inp_winrate[w]);
+                t1.start();
+                thread t2 = new thread(inp_i[i], inp_n[i], inp_oneTest, inp_allTest, inp_winrate[w]);
+                t2.start();
+                thread t3 = new thread(inp_i[i], inp_n[i], inp_oneTest, inp_allTest, inp_winrate[w]);
+                t3.start();
+                thread t4 = new thread(inp_i[i], inp_n[i], inp_oneTest, inp_allTest, inp_winrate[w]);
+                t4.start();
 
-        try {
-            t1.join();
-            t2.join();
-            t3.join();
-            t4.join();
-        } catch (Exception e) {
-            System.out.println(e);
+                try {
+                    t1.join();
+                    t2.join();
+                    t3.join();
+                    t4.join();
+                } catch (Exception e) {
+                    System.out.println(e);
+                }
+
+                double[] allrate = mergeArray(t1.getallrate(), t2.getallrate());
+                allrate = mergeArray(allrate, t3.getallrate());
+                allrate = mergeArray(allrate, t4.getallrate());
+
+                writeTotxt(allrate, inp_winrate[w], inp_i[i], inp_n[i], inp_oneTest, inp_allTest*4);
+
+                endTime = System.nanoTime();
+                System.out.println("one opt = " + (endTime - startTime) / 1000000);
+
+            }
         }
-
-        double[] allrate = mergeArray(t1.getallrate(), t2.getallrate());
-        allrate = mergeArray(allrate, t3.getallrate());
-        allrate = mergeArray(allrate, t4.getallrate());
-        
-        writeTotxt(allrate);
-
-        endTime = System.nanoTime();
-        System.out.println("run time = " + (endTime - startTime) / 1000000);
 
     }
 
@@ -66,9 +69,11 @@ public class App {
         return c;
     }
 
-    public static void writeTotxt(double[] allrate) {
+    public static void writeTotxt(double[] allrate, int _winrate, int _i, int _n, int _oneTest, int _allTest) {
         try {
-            String filename = "result_" + String.format("wr_%d_%d_%d_%d_%d", inp_winrate , inp_i, inp_n,inp_oneTest, inp_allTest*4) + ".txt";
+            String filename = "result_"
+                    + String.format("wr_%d_%d_%d_%d_%d", _winrate, _i, _n, _oneTest, _allTest)
+                    + ".txt";
             FileWriter myWriter = new FileWriter(filename);
             String str;
             for (int j = 0; j < allrate.length; j++) {

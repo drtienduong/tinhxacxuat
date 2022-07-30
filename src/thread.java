@@ -28,7 +28,7 @@ public class thread extends Thread {
                 for (int i = 0; i < inp_n; i++) {
                     // this is one dice
                     k = rand.nextInt(100) + 1; // get random int from 1 to 100
-                    cons = k > inp_winrate ? cons + 1 : 0  ;
+                    cons = k > inp_winrate ? cons + 1 : 0 ;
 
                     if (max_cons < cons)
                         max_cons = cons;
